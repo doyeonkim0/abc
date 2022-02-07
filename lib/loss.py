@@ -17,6 +17,11 @@ class LossInterface(metaclass=abc.ABCMeta):
     def print_loss(self):
         pass
 
+    @property
+    @abc.abstractmethod
+    def loss_dict(self):
+        pass
+
 
 class Loss:
     L1 = torch.nn.L1Loss().to("cuda")
@@ -84,3 +89,9 @@ class Loss:
         assert(grad_dout2.size() == x_in.size())
         reg = 0.5 * grad_dout2.view(batch_size, -1).sum(1).mean(0)
         return reg
+
+    def get_adversarial_loss(logits, target):
+        assert target in [1, 0]
+        targets = torch.full_like(logits, fill_value=target)
+        loss = F.binary_cross_entropy_with_logits(logits, targets)
+        return loss

@@ -17,7 +17,8 @@ def train_options():
 
     # dataset
     parser.add_argument('--dataset_list', type=list, \
-        default=['/home/compu/dataset/kface_wild_cv2_256'])
+        # default=['/home/compu/dataset/kface_wild_cv2_256'])
+        default=['/home/compu/dataset/CelebHQ'])
 
     # learning rate
     parser.add_argument('--lr_G', type=str, default=1e-4)

@@ -2,7 +2,7 @@ import torch
 import os
 
         
-def load_ckpt(args, model, name, global_step=-1):
+def load_checkpoint(args, model, name, global_step=-1):
     if global_step == -1:
         idx = 'latest'
     else:
@@ -12,7 +12,7 @@ def load_ckpt(args, model, name, global_step=-1):
     model.load_state_dict(ckpt, strict=False)
 
 
-def save_ckpt(args, model, name, global_step):
+def save_checkpoint(args, model, global_step, name):
     dir_path = f'{args.save_root}/{args.run_id}/ckpt'
     os.makedirs(dir_path, exist_ok=True)
     

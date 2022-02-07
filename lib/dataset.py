@@ -1,8 +1,8 @@
+import glob
+from PIL import Image
+import random
 from torch.utils.data import Dataset
 import torchvision.transforms as transforms
-from PIL import Image
-import glob
-import random
 
 
 class FaceDataset(Dataset):
