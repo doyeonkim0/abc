@@ -51,6 +51,7 @@ def train(gpu, args):
 
         global_step += 1
 
+
 if __name__ == "__main__":
     args = options.train_options()
     os.makedirs(args.save_root, exist_ok=True)
