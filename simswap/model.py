@@ -13,8 +13,9 @@ class SimSwap(FaceSwapInterface):
     def __init__(self, args, gpu):
         self.args = args
         self.gpu = gpu
+        self.model_name = 'G'  
+        # Extra property required in training
         self.downsample = nn.AvgPool2d(3, stride=2, padding=[1, 1], count_include_pad=False)
-        self.model_name = 'G'
 
     def initialize_models(self):
         self.G = Generator_Adain_Upsample(input_nc=3, output_nc=3, style_dim=512, n_blocks=9).cuda(self.gpu).train()

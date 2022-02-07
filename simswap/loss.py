@@ -1,6 +1,5 @@
 import time
-from lib.loss import LossInterface
-from lib.loss import Loss
+from lib.loss import Loss, LossInterface
 
 
 class SimSwapLoss(LossInterface):
