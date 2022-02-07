@@ -3,7 +3,7 @@ import torch
 from collections import namedtuple
 
 
-def normalize_l2(input,axis=1):
+def normalize_l2(input, axis=1):
     norm = torch.norm(input,2,axis,True)
     output = torch.div(input, norm)
     return output

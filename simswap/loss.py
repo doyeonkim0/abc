@@ -1,9 +1,9 @@
 import time
-from loss import LossInterface
-from loss import Loss
+from lib.loss import LossInterface
+from lib.loss import Loss
 
 
-class LossCollector(LossInterface):
+class SimSwapLoss(LossInterface):
     def __init__(self, args):
         self.args = args
         self.start_time = time.time()
