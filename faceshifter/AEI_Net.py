@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from id import arcface
+from submodel import arcface
 
 
 def weight_init(m):

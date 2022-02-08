@@ -3,7 +3,7 @@ from lib import checkpoint, utils
 from lib.faceswap import FaceSwapInterface
 from loss import FaceShifterLoss
 from AEI_Net import AEI_Net
-from MultiscaleDiscriminator import MultiscaleDiscriminator
+from submodel.discriminator import MultiscaleDiscriminator
 
 
 class FaceShifter(FaceSwapInterface):
