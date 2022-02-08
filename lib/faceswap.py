@@ -1,15 +1,40 @@
 import abc
+import torch
+from torch.utils.data import DataLoader
+from lib.dataset import FaceDataset
 
 
 class FaceSwapInterface(metaclass=abc.ABCMeta):
-    @abc.abstractmethod
-    def __init__():
+    def __init__(self, args, gpu):
         """
-        self.{args, gpu, model_name} should be initialized.
-        Extra member variables can also be initialized here if necessary.
+        When overrided, super call is required.
         """
-        pass
-    
+        self.args = args
+        self.gpu = gpu
+
+    def load_next_batch(self):
+        try:
+            I_source, I_target, same_person = next(self.iterator)
+        except StopIteration:
+            self.iterator = iter(self.dataloader)
+            I_source, I_target, same_person = next(self.iterator)
+            
+        I_source, I_target, same_person = I_source.to(self.gpu), I_target.to(self.gpu), same_person.to(self.gpu)
+        return I_source, I_target, same_person
+
+    def set_dataset(self):
+        self.dataset = FaceDataset(self.args.dataset_list, same_prob=self.args.same_prob)
+
+    def set_data_iterator(self):
+        """
+        Construct sampler according to number of GPUs it is utilizing.
+        Using self.dataset and sampler, construct dataloader.
+        Store Iterator from dataloader as a member variable.
+        """
+        sampler = torch.utils.data.distributed.DistributedSampler(self.dataset) if self.args.use_mGPU else None
+        self.dataloader = DataLoader(self.dataset, batch_size=self.args.batch_size, pin_memory=True, sampler=sampler, num_workers=8, drop_last=True)
+        self.iterator = iter(self.dataloader)
+
     @abc.abstractmethod
     def initialize_models(self):
         """
@@ -17,24 +42,6 @@ class FaceSwapInterface(metaclass=abc.ABCMeta):
         Models should be assigned to member variables.
 
         eg. self.D = Discriminator(input_nc=3).cuda(self.gpu).train() 
-        """
-        pass
-
-    @abc.abstractmethod
-    def set_dataset(self):
-        """
-        Set dataset as a member variable.
-
-        eg. self.dataset = FaceDataset(dataset_list, same_prob)
-        """
-        pass
-
-    @abc.abstractmethod
-    def set_data_iterator(self):
-        """
-        Construct sampler according to number of GPUs it is utilizing.
-        Using self.dataset and sampler, construct dataloader.
-        Store Iterator from dataloader as a member variable.
         """
         pass
 
@@ -67,10 +74,6 @@ class FaceSwapInterface(metaclass=abc.ABCMeta):
         loss_collector should be an implementation of lib.loss.LossInterface.
         This property should be assigned in self.set_loss_collector.
         """
-        pass
-
-    @abc.abstractmethod
-    def load_next_batch(self):
         pass
 
     @abc.abstractmethod

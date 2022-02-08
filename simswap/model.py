@@ -1,34 +1,19 @@
 import torch
-import torch.nn as nn
-from torch.utils.data import DataLoader
-
 from lib import checkpoint, utils
 from lib.faceswap import FaceSwapInterface
-from lib.dataset import FaceDataset
 from simswap.simswap import Generator_Adain_Upsample, Discriminator
 from loss import SimSwapLoss
 
 
 class SimSwap(FaceSwapInterface):
     def __init__(self, args, gpu):
-        self.args = args
-        self.gpu = gpu
-        self.model_name = 'G'  
-        # Extra property required in training
-        self.downsample = nn.AvgPool2d(3, stride=2, padding=[1, 1], count_include_pad=False)
+        self.downsample = torch.nn.AvgPool2d(3, stride=2, padding=[1, 1], count_include_pad=False)
+        super().__init__(args, gpu)
 
     def initialize_models(self):
         self.G = Generator_Adain_Upsample(input_nc=3, output_nc=3, style_dim=512, n_blocks=9).cuda(self.gpu).train()
         self.D1 = Discriminator(input_nc=3).cuda(self.gpu).train()
         self.D2 = Discriminator(input_nc=3).cuda(self.gpu).train()
-
-    def set_dataset(self):
-        self.dataset = FaceDataset(self.args.dataset_list, same_prob=self.args.same_prob)
-
-    def set_data_iterator(self):
-        sampler = torch.utils.data.distributed.DistributedSampler(self.dataset) if self.args.use_mGPU else None
-        dataloader = DataLoader(self.dataset, batch_size=self.args.batch_size, pin_memory=True, sampler=sampler, num_workers=8, drop_last=True)
-        self.iterator = iter(dataloader)
 
     def set_multi_GPU(self):
         utils.setup_ddp(self.gpu, self.args.gpu_num)
@@ -42,7 +27,7 @@ class SimSwap(FaceSwapInterface):
         self.D2 = D2.module
         
     def load_checkpoint(self, step=-1):
-        checkpoint.load_checkpoint(self.args, self.G, name=self.model_name, global_step=step)
+        checkpoint.load_checkpoint(self.args, self.G, name='G', global_step=step)
 
     def set_optimizers(self):
         self.opt_G = torch.optim.Adam(self.G.parameters(), lr=self.args.lr_G, betas=(0, 0.999))
@@ -50,11 +35,6 @@ class SimSwap(FaceSwapInterface):
 
     def set_loss_collector(self):
         self.loss_collector = SimSwapLoss(self.args)
-
-    def load_next_batch(self):
-        I_source, I_target, same_person = next(self.iterator)
-        I_source, I_target, same_person = I_source.to(self.gpu), I_target.to(self.gpu), same_person.to(self.gpu)
-        return I_source, I_target, same_person
 
     def train_step(self):
         I_source, I_target, same_person = self.load_next_batch()
@@ -113,4 +93,4 @@ class SimSwap(FaceSwapInterface):
         utils.save_image(self.args, step, "imgs", result)
 
     def save_checkpoint(self, step):
-        checkpoint.save_checkpoint(self.args, self.G, step, name=self.model_name)
+        checkpoint.save_checkpoint(self.args, self.G, step, name='G')
