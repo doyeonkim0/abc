@@ -94,4 +94,4 @@ class SimSwap(FaceSwapInterface):
         utils.save_image(self.args, step, "imgs", result)
 
     def save_checkpoint(self, step):
-        checkpoint.save_checkpoint(self.args, self.G, step, name='G')
+        checkpoint.save_checkpoint(self.args, self.G, self.opt_G, step, name='G')

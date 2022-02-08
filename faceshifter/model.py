@@ -61,5 +61,5 @@ class FaceShifter(FaceSwapInterface):
         utils.save_image(self.args, step, "imgs", result)
 
     def save_checkpoint(self, step):
-        checkpoint.save_checkpoint(self.args, self.G, step, name='G')
-        checkpoint.save_checkpoint(self.args, self.D, step, name='D')
+        checkpoint.save_checkpoint(self.args, self.G, self.opt_G, step, name='G')
+        checkpoint.save_checkpoint(self.args, self.D, self.opt_D, step, name='D')

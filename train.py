@@ -20,7 +20,7 @@ def train(gpu, args):
         model.set_multi_GPU()
 
     model.set_data_iterator()
-    model.load_checkpoint()
+    step = model.load_checkpoint()
     model.set_optimizers()
     model.set_loss_collector()
 
@@ -31,7 +31,7 @@ def train(gpu, args):
         wandb.init(project=args.project_id, name=args.run_id)
 
     # Training loop
-    global_step = 0
+    global_step = step if step else 0
     while global_step < args.max_step:
         result = model.train_step()
 
