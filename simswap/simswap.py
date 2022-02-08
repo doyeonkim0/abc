@@ -1,4 +1,4 @@
-import arcface
+import id.arcface as arcface
 import torch
 from torch import nn
 import torch.nn.functional as F
