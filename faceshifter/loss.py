@@ -15,28 +15,27 @@ class FaceShifterLoss(LossInterface):
         if self.args.W_adv:
             L_adv = Loss.get_hinge_loss(d_adv, True)
             L_G += self.args.W_adv * L_adv
+            self.loss_dict["L_adv"] = round(L_adv.item(), 4)
         
         # Id loss
         if self.args.W_id:
             L_id = Loss.get_id_loss(I_s_id.detach(), Y_id)
             L_G += self.args.W_id * L_id
+            self.loss_dict["L_id"] = round(L_id.item(), 4)
 
         # Attribute loss
         if self.args.W_attr:
             L_attr = Loss.get_attr_loss(I_t_attr, Y_attr)
             L_G += self.args.W_attr * L_attr
+            self.loss_dict["L_attr"] = round(L_attr.item(), 4)
 
         # Reconstruction loss
         if self.args.W_recon:
             L_recon = Loss.get_L2_loss_with_same_person(Y, I_t, same_person)
             L_G += self.args.W_recon * L_recon
+            self.loss_dict["L_recon"] = round(L_recon.item(), 4)
         
         self.loss_dict["L_G"] = round(L_G.item(), 4)
-        self.loss_dict["L_attr"] = round(L_attr.item(), 4)
-        self.loss_dict["L_id"] = round(L_id.item(), 4)
-        self.loss_dict["L_adv"] = round(L_adv.item(), 4)
-        self.loss_dict["L_recon"] = round(L_recon.item(), 4)
-
         return L_G
 
     def get_loss_D(self, d_true, d_fake):
