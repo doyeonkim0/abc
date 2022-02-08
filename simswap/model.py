@@ -1,7 +1,8 @@
 import torch
 from lib import checkpoint, utils
 from lib.faceswap import FaceSwapInterface
-from simswap.simswap import Generator_Adain_Upsample, Discriminator
+from simswap.simswap import Generator_Adain_Upsample
+from submodel.discriminator import Discriminator
 from loss import SimSwapLoss
 
 
