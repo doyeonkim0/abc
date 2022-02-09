@@ -20,8 +20,8 @@ def train(gpu, args):
         model.set_multi_GPU()
 
     model.set_data_iterator()
-    step = model.load_checkpoint()
     model.set_optimizers()
+    step = model.load_checkpoint()
     model.set_loss_collector()
 
     args.isMaster = gpu == 0
