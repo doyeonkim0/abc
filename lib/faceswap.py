@@ -2,6 +2,7 @@ import abc
 import torch
 from torch.utils.data import DataLoader
 from lib.dataset import FaceDataset
+from lib import utils
 
 
 class FaceSwapInterface(metaclass=abc.ABCMeta):
@@ -34,6 +35,9 @@ class FaceSwapInterface(metaclass=abc.ABCMeta):
         sampler = torch.utils.data.distributed.DistributedSampler(self.dataset) if self.args.use_mGPU else None
         self.dataloader = DataLoader(self.dataset, batch_size=self.args.batch_size, pin_memory=True, sampler=sampler, num_workers=8, drop_last=True)
         self.iterator = iter(self.dataloader)
+
+    def save_image(self, result, step):
+        utils.save_image(self.args, step, "imgs", result)
 
     @abc.abstractmethod
     def initialize_models(self):
