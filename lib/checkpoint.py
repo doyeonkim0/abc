@@ -16,7 +16,7 @@ def load_checkpoint(args, model, optimizer, name, global_step=-1):
     return ckpt_dict['step']
 
 
-def save_checkpoint(args, model, optimizer, global_step, name):
+def save_checkpoint(args, model, optimizer, name, global_step):
     ckpt_dict = {}
     ckpt_dict['model'] = model.state_dict()
     ckpt_dict['optimizer'] = optimizer.state_dict()

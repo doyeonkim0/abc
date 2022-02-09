@@ -21,8 +21,8 @@ class FaceShifter(FaceSwapInterface):
         self.D = D.module
         
     def load_checkpoint(self, step=-1):
-        checkpoint.load_checkpoint(self.args, self.G, name='G', global_step=step)
-        checkpoint.load_checkpoint(self.args, self.D, name='D', global_step=step)
+        checkpoint.load_checkpoint(self.args, self.G, self.opt_G, name='G', global_step=step)
+        checkpoint.load_checkpoint(self.args, self.D, self.opt_D, name='D', global_step=step)
 
     def set_optimizers(self):
         self.opt_G = torch.optim.Adam(self.G.parameters(), lr=self.args.lr_G, betas=(0, 0.999))
@@ -57,9 +57,6 @@ class FaceShifter(FaceSwapInterface):
 
         return [I_source, I_target, Y]
 
-    def save_image(self, result, step):
-        utils.save_image(self.args, step, "imgs", result)
-
     def save_checkpoint(self, step):
-        checkpoint.save_checkpoint(self.args, self.G, self.opt_G, step, name='G')
-        checkpoint.save_checkpoint(self.args, self.D, self.opt_D, step, name='D')
+        checkpoint.save_checkpoint(self.args, self.G, self.opt_G, name='G', global_step=step)
+        checkpoint.save_checkpoint(self.args, self.D, self.opt_D, name='D', global_step=step)

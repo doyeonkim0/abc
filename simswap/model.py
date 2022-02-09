@@ -28,7 +28,7 @@ class SimSwap(FaceSwapInterface):
         self.D2 = D2.module
         
     def load_checkpoint(self, step=-1):
-        checkpoint.load_checkpoint(self.args, self.G, name='G', global_step=step)
+        checkpoint.load_checkpoint(self.args, self.G, self.opt_G, name='G', global_step=step)
 
     def set_optimizers(self):
         self.opt_G = torch.optim.Adam(self.G.parameters(), lr=self.args.lr_G, betas=(0, 0.999))
@@ -89,9 +89,6 @@ class SimSwap(FaceSwapInterface):
         utils.update_net(self.opt_D, loss_D)
 
         return [I_source, I_target, I_swapped]
-
-    def save_image(self, result, step):
-        utils.save_image(self.args, step, "imgs", result)
 
     def save_checkpoint(self, step):
         checkpoint.save_checkpoint(self.args, self.G, self.opt_G, step, name='G')
