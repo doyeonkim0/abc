@@ -2,6 +2,7 @@ import submodel.arcface as arcface
 import torch
 from torch import nn
 import torch.nn.functional as F
+from lib.utils import AdaIN
 
 
 class InstanceNorm(nn.Module):
@@ -18,19 +19,6 @@ class InstanceNorm(nn.Module):
         tmp = torch.mul(x, x) # or x ** 2
         tmp = torch.rsqrt(torch.mean(tmp, (2, 3), True) + self.epsilon)
         return x * tmp
-
-
-class AdaIN(nn.Module):
-    def __init__(self, style_dim, num_features):
-        super().__init__()
-        self.norm = nn.InstanceNorm2d(num_features, affine=False)
-        self.fc = nn.Linear(style_dim, num_features*2)
-
-    def forward(self, x, s):
-        h = self.fc(s)
-        h = h.view(h.size(0), h.size(1), 1, 1)
-        gamma, beta = torch.chunk(h, chunks=2, dim=1)
-        return (1 + gamma) * self.norm(x) + beta
 
 
 class ResnetBlock_Adain(nn.Module):
@@ -127,7 +115,6 @@ class Generator_Adain_Upsample(nn.Module):
         return self.arcface(F.interpolate(I[:, :, 16:240, 16:240], [112, 112], mode='bilinear', align_corners=True))
 
     def forward(self, I_source, I_target):
-
         id_source = self.get_id(I_source)
 
         x = I_target  # 3*224*224

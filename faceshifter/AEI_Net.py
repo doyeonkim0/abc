@@ -2,17 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from submodel import arcface
-
-
-def weight_init(m):
-    if isinstance(m, nn.Linear):
-        m.weight.data.normal_(0, 0.001)
-        m.bias.data.zero_()
-    if isinstance(m, nn.Conv2d):
-        nn.init.xavier_normal_(m.weight.data)
-
-    if isinstance(m, nn.ConvTranspose2d):
-        nn.init.xavier_normal_(m.weight.data)
+from lib.utils import weight_init
 
 
 def conv4x4(in_c, out_c, norm=nn.BatchNorm2d):
