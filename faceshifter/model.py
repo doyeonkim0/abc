@@ -2,7 +2,7 @@ import torch
 from lib import checkpoint, utils
 from lib.faceswap import FaceSwapInterface
 from loss import FaceShifterLoss
-from AEI_Net import AEI_Net
+from abc.faceshifter.faceshifter import AEI_Net
 from submodel.discriminator import MultiscaleDiscriminator
 
 

@@ -3,10 +3,10 @@ import wandb
 import os
 import sys
 
-sys.path.append("/home/compu/cleancode/abc")
+sys.path.append("./")
 from lib import options
 from simswap.model import SimSwap
-
+from faceshifter.model import Faceshifter
 
 def train(gpu, args): 
     torch.cuda.set_device(gpu)
