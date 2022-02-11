@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import transforms
 from submodel import arcface
-from deep3dmm import ParametricFaceModel, ReconNet
+from abc.submodel.deep3dmm import ParametricFaceModel, ReconNet
 from lib.utils import AdaIN, weight_init
 
 

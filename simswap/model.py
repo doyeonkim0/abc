@@ -20,15 +20,13 @@ class SimSwap(FaceSwapInterface):
         utils.setup_ddp(self.gpu, self.args.gpu_num)
 
         # Data parallelism is required to use multi-GPU
-        G = torch.nn.parallel.DistributedDataParallel(self.G, device_ids=[self.gpu], broadcast_buffers=False, find_unused_parameters=True)
-        D1 = torch.nn.parallel.DistributedDataParallel(self.D1, device_ids=[self.gpu])
-        D2 = torch.nn.parallel.DistributedDataParallel(self.D2, device_ids=[self.gpu])
-        self.G = G.module
-        self.D1 = D1.module
-        self.D2 = D2.module
+        self.G = torch.nn.parallel.DistributedDataParallel(self.G, device_ids=[self.gpu], broadcast_buffers=False, find_unused_parameters=True).module
+        self.D1 = torch.nn.parallel.DistributedDataParallel(self.D1, device_ids=[self.gpu]).module
+        self.D2 = torch.nn.parallel.DistributedDataParallel(self.D2, device_ids=[self.gpu]).module
         
     def load_checkpoint(self, step=-1):
         checkpoint.load_checkpoint(self.args, self.G, self.opt_G, name='G', global_step=step)
+        checkpoint.load_checkpoint(self.args, self.D, self.opt_D, name='D', global_step=step)
 
     def set_optimizers(self):
         self.opt_G = torch.optim.Adam(self.G.parameters(), lr=self.args.lr_G, betas=(0, 0.999))
@@ -76,13 +74,13 @@ class SimSwap(FaceSwapInterface):
         D_list = []
 
         # D_Real
-        d_real1 = self.D1.forward(I_target)
-        d_real2 = self.D2.forward(I_target_downsampled)
+        d_real1 = self.D1(I_target)
+        d_real2 = self.D2(I_target_downsampled)
         D_list += [d_real1, d_real2]
 
         # D_Fake
-        d_fake1 = self.D1.forward(I_swapped.detach())
-        d_fake2 = self.D2.forward(I_swapped_downsampled.detach())
+        d_fake1 = self.D1(I_swapped.detach())
+        d_fake2 = self.D2(I_swapped_downsampled.detach())
         D_list += [d_fake1, d_fake2]
 
         loss_D = self.loss_collector.get_loss_D(*D_list)
