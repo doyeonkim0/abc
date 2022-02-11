@@ -34,7 +34,7 @@ class HifiFace(FaceSwapInterface):
         self.opt_D = torch.optim.Adam(self.D.parameters(), lr=self.args.lr_D, betas=(0, 0.999))
 
     def set_loss_collector(self):
-        self.loss_collector = HifiFaceLoss(self.args)
+        self._loss_collector = HifiFaceLoss(self.args)
 
     def train_step(self):
         I_s, I_t, same_person = self.load_next_batch()
@@ -84,3 +84,7 @@ class HifiFace(FaceSwapInterface):
     def save_checkpoint(self, step):
         checkpoint.save_checkpoint(self.args, self.G, self.opt_G, name='G', global_step=step)
         checkpoint.save_checkpoint(self.args, self.D, self.opt_D, name='D', global_step=step)   
+
+    @property
+    def loss_collector(self):
+        return self._loss_collector

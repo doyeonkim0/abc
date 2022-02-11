@@ -6,7 +6,7 @@ class SimSwapLoss(LossInterface):
     def __init__(self, args):
         self.args = args
         self.start_time = time.time()
-        self.loss_dict = {}
+        self._loss_dict = {}
 
     def get_loss_G(self, I_source, I_target, same_person, I_swapped, g_fake1, g_fake2, g_real1, g_real2, id_swapped, id_source):
         L_G = 0.0
@@ -80,3 +80,7 @@ class SimSwapLoss(LossInterface):
         print(f'steps: {global_step:06} / {self.args.max_step}')
         print(f'lossD: {self.loss_dict["L_D"]} | lossG: {self.loss_dict["L_G"]}')
     
+    @property
+    def loss_dict(self):
+        return self._loss_dict
+        
