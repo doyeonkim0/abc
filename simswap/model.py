@@ -53,10 +53,10 @@ class SimSwap(FaceSwapInterface):
         I_target_downsampled = self.downsample(I_target)
 
         # Run D
-        g_fake1 = self.D1.forward(I_swapped)
-        g_fake2 = self.D2.forward(I_swapped_downsampled)
-        g_real1 = self.D1.forward(I_target)
-        g_real2 = self.D2.forward(I_target_downsampled)
+        g_fake1 = self.D1(I_swapped)
+        g_fake2 = self.D2(I_swapped_downsampled)
+        g_real1 = self.D1(I_target)
+        g_real2 = self.D2(I_target_downsampled)
         G_list += [g_fake1, g_fake2, g_real1, g_real2]
         
         # Run ArcFace to extract identity vectors from swapped and source image
@@ -90,3 +90,4 @@ class SimSwap(FaceSwapInterface):
 
     def save_checkpoint(self, step):
         checkpoint.save_checkpoint(self.args, self.G, self.opt_G, step, name='G')
+        checkpoint.save_checkpoint(self.args, self.D, self.opt_D, step, name='D')
