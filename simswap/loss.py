@@ -14,8 +14,8 @@ class SimSwapLoss(LossInterface):
         # Adversarial loss
         if self.args.W_adv:
             L_adv = 0
-            L_adv += Loss.get_hinge_loss(g_fake1, True, for_discriminator=False)
-            L_adv += Loss.get_hinge_loss(g_fake2, True, for_discriminator=False)
+            L_adv += Loss.get_hinge_loss(g_fake1, True)
+            L_adv += Loss.get_hinge_loss(g_fake2, True)
             L_G += self.args.W_adv * L_adv
             self.loss_dict["L_adv"] = round(L_adv.item(), 4)
         
@@ -27,13 +27,13 @@ class SimSwapLoss(LossInterface):
 
         # Attribute loss
         if self.args.W_attr:
-            L_attr = Loss.get_attr_loss(I_target, I_swapped)
+            L_attr = Loss.get_attr_loss(I_target, I_swapped, self.args.batch_size)
             L_G += self.args.W_attr * L_attr
             self.loss_dict["L_attr"] = round(L_attr.item(), 4)
 
         # Reconstruction loss
         if self.args.W_recon:
-            L_recon = Loss.get_L1_loss_with_same_person(I_swapped, I_target, same_person)
+            L_recon = Loss.get_L1_loss_with_same_person(I_swapped, I_target, same_person, self.args.batch_size)
             L_G += self.args.W_recon * L_recon
             self.loss_dict["L_recon"] = round(L_recon.item(), 4)
         
@@ -57,13 +57,13 @@ class SimSwapLoss(LossInterface):
     def get_loss_D(self, d_real1, d_real2, d_fake1, d_fake2):
         # Real 
         L_D_real = 0
-        L_D_real += Loss.get_hinge_loss(d_real1, True, for_discriminator=True)
-        L_D_real += Loss.get_hinge_loss(d_real2, True, for_discriminator=True)
+        L_D_real += Loss.get_hinge_loss(d_real1, True)
+        L_D_real += Loss.get_hinge_loss(d_real2, True)
 
         # Fake
         L_D_fake = 0
-        L_D_fake += Loss.get_hinge_loss(d_fake1, False, for_discriminator=True)
-        L_D_fake += Loss.get_hinge_loss(d_fake2, False, for_discriminator=True)
+        L_D_fake += Loss.get_hinge_loss(d_fake1, False)
+        L_D_fake += Loss.get_hinge_loss(d_fake2, False)
 
         L_D = 0.5*(L_D_real.mean() + L_D_fake.mean())
         

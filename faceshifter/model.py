@@ -1,8 +1,8 @@
 import torch
 from lib import checkpoint, utils
 from lib.faceswap import FaceSwapInterface
-from loss import FaceShifterLoss
-from abc.faceshifter.faceshifter import AEI_Net
+from faceshifter.loss import FaceShifterLoss
+from faceshifter.faceshifter import AEI_Net
 from submodel.discriminator import MultiscaleDiscriminator
 
 
@@ -40,8 +40,6 @@ class FaceShifter(FaceSwapInterface):
         Y_attr = self.G.get_attr(Y)
         Y_id = self.G.get_id(Y)
         d_adv = self.D(Y)
-        d_true = self.D(I_source)
-        d_fake = self.D(Y.detach())
 
         loss_G = self.loss_collector.get_loss_G(I_target, Y, I_t_attr, I_s_id, Y_attr, Y_id, d_adv, same_person)
         utils.update_net(self.opt_G, loss_G)
@@ -50,11 +48,17 @@ class FaceShifter(FaceSwapInterface):
         # train D #
         ###########
 
-        loss_D = self.loss_collector.get_loss_D(d_true, d_fake)
+        d_real = self.D(I_source)
+        d_fake = self.D(Y.detach())
+        
+        loss_D = self.loss_collector.get_loss_D(d_real, d_fake)
         utils.update_net(self.opt_D, loss_D)
 
         return [I_source, I_target, Y]
 
+    def save_image(self, result, step):
+        utils.save_image(self.args, step, "imgs", result)
+        
     def save_checkpoint(self, step):
         checkpoint.save_checkpoint(self.args, self.G, self.opt_G, name='G', global_step=step)
         checkpoint.save_checkpoint(self.args, self.D, self.opt_D, name='D', global_step=step)

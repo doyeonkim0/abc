@@ -24,7 +24,7 @@ class FaceSwapInterface(metaclass=abc.ABCMeta):
         return I_source, I_target, same_person
 
     def set_dataset(self):
-        self.dataset = FaceDataset(self.args.dataset_list, same_prob=self.args.same_prob)
+        self.dataset = FaceDataset(self.args.dataset_root_list, same_prob=self.args.same_prob)
 
     def set_data_iterator(self):
         """
@@ -36,8 +36,6 @@ class FaceSwapInterface(metaclass=abc.ABCMeta):
         self.dataloader = DataLoader(self.dataset, batch_size=self.args.batch_size, pin_memory=True, sampler=sampler, num_workers=8, drop_last=True)
         self.iterator = iter(self.dataloader)
 
-    def save_image(self, result, step):
-        utils.save_image(self.args, step, "imgs", result)
 
     @abc.abstractmethod
     def initialize_models(self):
@@ -71,8 +69,8 @@ class FaceSwapInterface(metaclass=abc.ABCMeta):
         """
         pass
 
-    @abc.abstractmethod
     @property
+    @abc.abstractmethod
     def loss_collector(self):
         """
         loss_collector should be an implementation of lib.loss.LossInterface.

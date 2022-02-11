@@ -1,0 +1,7 @@
+training_result
+wandb
+*.pyc
+*__pycache__
+hififace/BFM/*
+ptnn/*
+*.zip

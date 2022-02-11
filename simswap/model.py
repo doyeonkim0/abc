@@ -3,7 +3,7 @@ from lib import checkpoint, utils
 from lib.faceswap import FaceSwapInterface
 from simswap.simswap import Generator_Adain_Upsample
 from submodel.discriminator import Discriminator
-from loss import SimSwapLoss
+from simswap.loss import SimSwapLoss
 
 
 class SimSwap(FaceSwapInterface):
@@ -26,7 +26,7 @@ class SimSwap(FaceSwapInterface):
         
     def load_checkpoint(self, step=-1):
         checkpoint.load_checkpoint(self.args, self.G, self.opt_G, name='G', global_step=step)
-        checkpoint.load_checkpoint(self.args, self.D, self.opt_D, name='D', global_step=step)
+        checkpoint.load_checkpoint(self.args, self.D1, self.opt_D, name='D', global_step=step)
 
     def set_optimizers(self):
         self.opt_G = torch.optim.Adam(self.G.parameters(), lr=self.args.lr_G, betas=(0, 0.999))
@@ -89,8 +89,12 @@ class SimSwap(FaceSwapInterface):
         return [I_source, I_target, I_swapped]
 
     def save_checkpoint(self, step):
-        checkpoint.save_checkpoint(self.args, self.G, self.opt_G, step, name='G')
+        checkpoint.save_checkpoint(self.args, self.G, self.opt_G, name='G', global_step=step)
+        checkpoint.save_checkpoint(self.args, self.D1, self.opt_D, name='D', global_step=step)
 
+    def save_image(self, result, step):
+        utils.save_image(self.args, step, "imgs", result)
+        
     @property
     def loss_collector(self):
         return self._loss_collector

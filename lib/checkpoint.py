@@ -9,11 +9,15 @@ def load_checkpoint(args, model, optimizer, name, global_step=-1):
         idx = global_step
 
     ckpt_path = f'{args.save_root}/{args.ckpt_id}/ckpt/{name}_{idx}.pt'
-    ckpt_dict = torch.load(ckpt_path, map_location=torch.device('cuda'))
 
-    model.load_state_dict(ckpt_dict['model'], strict=False)
-    optimizer.load_state_dict(ckpt_dict['optimizer'], strict=False)
-    return ckpt_dict['step']
+    try:
+        ckpt_dict = torch.load(ckpt_path, map_location=torch.device('cuda'))
+        model.load_state_dict(ckpt_dict['model'], strict=False)
+        optimizer.load_state_dict(ckpt_dict['optimizer'])
+        return ckpt_dict['step']
+    except:
+        print("fail to load checkpoints")
+        return 0
 
 
 def save_checkpoint(args, model, optimizer, name, global_step):

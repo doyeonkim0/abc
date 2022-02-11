@@ -2,10 +2,10 @@
 import torch
 from lib import checkpoint, utils
 from lib.faceswap import FaceSwapInterface
-from loss import HifiFaceLoss
-from hififace import HifiFace
+from hififace.loss import HifiFaceLoss
+from hififace.hififace import Generator
 from submodel.discriminator import StarGANv2Discriminator
-from submodel.segmentation import Segmentation
+from submodel.faceparser import FaceParser
 
 
 class HifiFace(FaceSwapInterface):
@@ -14,7 +14,7 @@ class HifiFace(FaceSwapInterface):
         super().__init__(args, gpu)
 
     def initialize_models(self):
-        self.G = HifiFace().cuda(self.gpu).train()
+        self.G = Generator().cuda(self.gpu).train()
         self.D = StarGANv2Discriminator().cuda(self.gpu).train()
 
     def set_multi_GPU(self):
@@ -52,7 +52,7 @@ class HifiFace(FaceSwapInterface):
         q_fuse = self.G.SAIE.get_lm3d(c_fuse)
 
         # Segmentation mask
-        M_tar = Segmentation.dilate(Segmentation.get_mask(I_t))
+        M_tar = FaceParser.dilate(FaceParser.get_mask(I_t))
 
         # Cycle image
         I_cycle = self.G(I_t, I_r)[0]
@@ -81,6 +81,9 @@ class HifiFace(FaceSwapInterface):
 
         return [I_s]
 
+    def save_image(self, result, step):
+        utils.save_image(self.args, step, "imgs", result)
+        
     def save_checkpoint(self, step):
         checkpoint.save_checkpoint(self.args, self.G, self.opt_G, name='G', global_step=step)
         checkpoint.save_checkpoint(self.args, self.D, self.opt_D, name='D', global_step=step)   

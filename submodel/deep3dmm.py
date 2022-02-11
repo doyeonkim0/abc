@@ -12,7 +12,7 @@ import os.path as osp
 
 class ParametricFaceModel:
     def __init__(self, 
-                bfm_folder='utils/BFM', 
+                bfm_folder='hififace/BFM', 
                 recenter=True,
                 camera_distance=10.,
                 init_lit=np.array([

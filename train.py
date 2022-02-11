@@ -6,7 +6,8 @@ import sys
 sys.path.append("./")
 from lib import options
 from simswap.model import SimSwap
-from faceshifter.model import Faceshifter
+# from faceshifter.model import FaceShifter
+# from hififace.model import HifiFace
 
 def train(gpu, args): 
     torch.cuda.set_device(gpu)
@@ -27,7 +28,7 @@ def train(gpu, args):
     args.isMaster = gpu == 0
 
     # Initialize wandb to gather and display loss on dashboard 
-    if args.isMaster:
+    if args.isMaster and args.use_wandb:
         wandb.init(project=args.project_id, name=args.run_id)
 
     # Training loop
@@ -38,7 +39,8 @@ def train(gpu, args):
         if args.isMaster:
             # Save and print loss
             if global_step % args.loss_cycle == 0:
-                wandb.log(model.loss_collector.loss_dict)
+                if args.use_wandb:
+                    wandb.log(model.loss_collector.loss_dict)
                 model.loss_collector.print_loss(global_step)
 
             # Save image

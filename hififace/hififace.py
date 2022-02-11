@@ -3,13 +3,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import transforms
 from submodel import arcface
-from abc.submodel.deep3dmm import ParametricFaceModel, ReconNet
+from submodel.deep3dmm import ParametricFaceModel, ReconNet
 from lib.utils import AdaIN, weight_init
 
 
-class HifiFace(nn.Module):
+class Generator(nn.Module):
     def __init__(self):
-        super(HifiFace, self).__init__()
+        super(Generator, self).__init__()
         
         self.SAIE = ShapeAwareIdentityExtractor()
         self.SFFM = SemanticFacialFusionModule()
