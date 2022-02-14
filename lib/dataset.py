@@ -13,12 +13,11 @@ class FaceDataset(Dataset):
         self.same_prob = same_prob
  
         for dataset_root in dataset_root_list:
-            imgpaths_in_root = []
-            for root, dirs, files in os.walk(dataset_root):
+            imgpaths_in_root = glob.glob(f'{dataset_root}/*.*g')
+
+            for root, dirs, _ in os.walk(dataset_root):
                 for dir in dirs:
                     imgpaths_in_root += glob.glob(f'{root}/{dir}/*.*g')
-                    
-                imgpaths_in_root += [f'{root}/{file}' for file in files]
 
             self.datasets.append(imgpaths_in_root)
             self.N.append(len(imgpaths_in_root))
