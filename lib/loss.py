@@ -24,11 +24,13 @@ class LossInterface(metaclass=abc.ABCMeta):
 
 
 class Loss:
-    L1 = torch.nn.L1Loss().to("cuda")
-    L2 = torch.nn.MSELoss().to("cuda")
-    # lpips = LPIPS().eval().to("cuda")
-    face_up = torch.nn.Upsample(scale_factor=4).to("cuda").eval()
-    face_pool = torch.nn.AdaptiveAvgPool2d((64, 64)).to("cuda").eval()  
+    @classmethod
+    def initialize(cls):
+        cls.L1 = torch.nn.L1Loss().to("cuda")
+        cls.L2 = torch.nn.MSELoss().to("cuda")
+        cls.lpips = LPIPS().eval().to("cuda")
+        cls.face_up = torch.nn.Upsample(scale_factor=4).to("cuda").eval()
+        cls.face_pool = torch.nn.AdaptiveAvgPool2d((64, 64)).to("cuda").eval()  
 
     def get_id_loss(a, b):
         return (1 - torch.cosine_similarity(a, b, dim=1)).mean()

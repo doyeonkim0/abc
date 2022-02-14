@@ -4,7 +4,7 @@ import os
 import sys
 
 sys.path.append("./")
-from lib import options
+from lib import options, loss
 from simswap.model import SimSwap
 # from faceshifter.model import FaceShifter
 # from hififace.model import HifiFace
@@ -24,6 +24,7 @@ def train(gpu, args):
     model.set_data_iterator()
     model.set_optimizers()
     step = model.load_checkpoint()
+    loss.Loss.initialize()
     model.set_loss_collector()
 
     # Initialize wandb to gather and display loss on dashboard 
