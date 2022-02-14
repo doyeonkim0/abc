@@ -1,3 +1,4 @@
+import array
 import torch
 from torch import Tensor
 import torch.nn as nn
@@ -535,10 +536,10 @@ class ReconNet(nn.Module):
 def LoadExpBasis(bfm_folder='BFM'):
     n_vertex = 53215
     Expbin = open(osp.join(bfm_folder, 'Exp_Pca.bin'), 'rb')
-    exp_dim = ('i')
+    exp_dim = array.array('i')
     exp_dim.fromfile(Expbin, 1)
-    expMU = ('f')
-    expPC = ('f')
+    expMU = array.array('f')
+    expPC = array.array('f')
     expMU.fromfile(Expbin, 3*n_vertex)
     expPC.fromfile(Expbin, 3*exp_dim[0]*n_vertex)
     Expbin.close()
@@ -563,7 +564,7 @@ def transferBFM09(bfm_folder='BFM'):
     texEV = original_BFM['texEV']  # eigen value
     texMU = original_BFM['texMU']  # mean texture
 
-    expPC, expEV = LoadExpBasis()
+    expPC, expEV = LoadExpBasis(bfm_folder)
 
     # transfer BFM09 to our face model
 

@@ -1,4 +1,5 @@
 import time
+import torch
 from lib.loss import Loss, LossInterface
 
 
@@ -7,6 +8,7 @@ class HifiFaceLoss(LossInterface):
         self.args = args
         self.start_time = time.time()
         self._loss_dict = {}
+        self.face_pool = torch.nn.AdaptiveAvgPool2d((64, 64)).to("cuda").eval()
 
     def get_loss_G(self, I_t, I_r, I_low, v_id_s, v_id_r, v_id_low, M_tar, M_high, M_low, q_r, q_low, q_fuse, I_cycle, d_adv, same_person):
         L_G = 0.0
@@ -14,7 +16,7 @@ class HifiFaceLoss(LossInterface):
         # Adversarial loss
         if self.args.W_adv:
             L_adv = Loss.get_BCE_loss(d_adv, True)
-            L_G += Loss.args.W_adv * L_adv
+            L_G += self.args.W_adv * L_adv
             self.loss_dict["L_adv"] = round(L_adv.item(), 4)
         
         # Shape loss
@@ -33,8 +35,8 @@ class HifiFaceLoss(LossInterface):
 
         # Reconstruction loss
         if self.args.W_recon:
-            L_recon = Loss.get_L1_loss_with_same_person(I_r, I_t, same_person)
-            L_recon += Loss.get_L1_loss_with_same_person(I_low, self.face_pool(I_t), same_person)
+            L_recon = Loss.get_L1_loss_with_same_person(I_r, I_t, same_person, self.args.batch_size)
+            L_recon += Loss.get_L1_loss_with_same_person(I_low, self.face_pool(I_t), same_person, self.args.batch_size)
             L_G += self.args.W_recon * L_recon
             self.loss_dict["L_recon"] = round(L_recon.item(), 4)
         
