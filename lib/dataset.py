@@ -8,26 +8,29 @@ import torchvision.transforms as transforms
 
 class FaceDataset(Dataset):
     def __init__(self, dataset_root_list, same_prob=0.2):
-        datasets = []
+        self.datasets = []
         self.N = []
         self.same_prob = same_prob
-
-        imgpaths_in_root = []
+ 
         for dataset_root in dataset_root_list:
+            imgpaths_in_root = []
             for root, dirs, files in os.walk(dataset_root):
                 for dir in dirs:
                     imgpaths_in_root += glob.glob(f'{root}/{dir}/*.*g')
+                    
+                imgpaths_in_root += [f'{root}/{file}' for file in files]
 
-            datasets.append(imgpaths_in_root)
+            self.datasets.append(imgpaths_in_root)
+            self.N.append(len(imgpaths_in_root))
 
-        self.N.append(len(imgpaths_in_root))
-        self.datasets = datasets
         self.transforms = transforms.Compose([
             transforms.Resize((256,256)),
             transforms.ColorJitter(0.2, 0.2, 0.2, 0.01),
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         ])
+
+        print(f"Dataset of {self.__len__()} images constructed.")
 
     def __getitem__(self, item):
         idx = 0
