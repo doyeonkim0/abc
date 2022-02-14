@@ -1,3 +1,4 @@
+import os
 import glob
 from PIL import Image
 import random
@@ -6,14 +7,20 @@ import torchvision.transforms as transforms
 
 
 class FaceDataset(Dataset):
-    def __init__(self, data_path_list, same_prob=0.2):
+    def __init__(self, dataset_root_list, same_prob=0.2):
         datasets = []
         self.N = []
         self.same_prob = same_prob
-        for data_path in data_path_list:
-            image_list = glob.glob(f'{data_path}/*.*g')
-            datasets.append(image_list)
-            self.N.append(len(image_list))
+
+        imgpaths_in_root = []
+        for dataset_root in dataset_root_list:
+            for root, dirs, files in os.walk(dataset_root):
+                for dir in dirs:
+                    imgpaths_in_root += glob.glob(f'{root}/{dir}/*.*g')
+
+            datasets.append(imgpaths_in_root)
+
+        self.N.append(len(imgpaths_in_root))
         self.datasets = datasets
         self.transforms = transforms.Compose([
             transforms.Resize((256,256)),

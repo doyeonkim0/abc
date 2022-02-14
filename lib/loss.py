@@ -1,5 +1,5 @@
 import abc
-from lpips import LPIPS
+from submodel.lpips import LPIPS
 import torch
 import torch.nn.functional as F
 
@@ -26,7 +26,7 @@ class LossInterface(metaclass=abc.ABCMeta):
 class Loss:
     L1 = torch.nn.L1Loss().to("cuda")
     L2 = torch.nn.MSELoss().to("cuda")
-    lpips = LPIPS().eval().to("cuda")
+    # lpips = LPIPS().eval().to("cuda")
     face_up = torch.nn.Upsample(scale_factor=4).to("cuda").eval()
     face_pool = torch.nn.AdaptiveAvgPool2d((64, 64)).to("cuda").eval()  
 

@@ -182,7 +182,7 @@ class AEI_Net(nn.Module):
 
         # face recognition model: arcface
         self.arcface = arcface.Backbone(50, 0.6, 'ir_se').eval()
-        self.arcface.load_state_dict(torch.load('ptnn/model_ir_se50.pth', map_location="cuda"), strict=False)
+        self.arcface.load_state_dict(torch.load('ptnn/arcface.pth', map_location="cuda"), strict=False)
         for param in self.arcface.parameters():
             param.requires_grad = False
 

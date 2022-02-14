@@ -23,8 +23,8 @@ class LPIPS(nn.Module):
                 own_state_dict[name].copy_(param)
 
     def forward(self, x, y):
-        x = (x - self.mu) / self.sigma
-        y = (y - self.mu) / self.sigma
+        # x = (x - self.mu) / self.sigma
+        # y = (y - self.mu) / self.sigma
         x_fmaps = self.alexnet(x)
         y_fmaps = self.alexnet(y)
         lpips_value = 0
