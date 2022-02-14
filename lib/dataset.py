@@ -7,7 +7,7 @@ import torchvision.transforms as transforms
 
 
 class FaceDataset(Dataset):
-    def __init__(self, dataset_root_list, same_prob=0.2):
+    def __init__(self, dataset_root_list, isMaster, same_prob=0.2):
         self.datasets = []
         self.N = []
         self.same_prob = same_prob
@@ -28,8 +28,8 @@ class FaceDataset(Dataset):
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         ])
-
-        print(f"Dataset of {self.__len__()} images constructed.")
+        if isMaster:
+            print(f"Dataset of {self.__len__()} images constructed.")
 
     def __getitem__(self, item):
         idx = 0

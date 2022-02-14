@@ -2,7 +2,6 @@ import abc
 import torch
 from torch.utils.data import DataLoader
 from lib.dataset import FaceDataset
-from lib import utils
 
 
 class FaceSwapInterface(metaclass=abc.ABCMeta):
@@ -24,7 +23,7 @@ class FaceSwapInterface(metaclass=abc.ABCMeta):
         return I_source, I_target, same_person
 
     def set_dataset(self):
-        self.dataset = FaceDataset(self.args.dataset_root_list, same_prob=self.args.same_prob)
+        self.dataset = FaceDataset(self.args.dataset_root_list, self.args.isMaster, same_prob=self.args.same_prob)
 
     def set_data_iterator(self):
         """

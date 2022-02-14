@@ -16,7 +16,8 @@ def load_checkpoint(args, model, optimizer, name, global_step=-1):
         optimizer.load_state_dict(ckpt_dict['optimizer'])
         return ckpt_dict['step']
     except:
-        print("fail to load checkpoints")
+        if args.isMaster:
+            print(f"Failed to load checkpoint of {name}.")
         return 0
 
 

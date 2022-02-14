@@ -11,6 +11,7 @@ from simswap.model import SimSwap
 
 def train(gpu, args): 
     torch.cuda.set_device(gpu)
+    args.isMaster = gpu == 0
 
     model = SimSwap(args, gpu)
 
@@ -24,8 +25,6 @@ def train(gpu, args):
     model.set_optimizers()
     step = model.load_checkpoint()
     model.set_loss_collector()
-
-    args.isMaster = gpu == 0
 
     # Initialize wandb to gather and display loss on dashboard 
     if args.isMaster and args.use_wandb:
