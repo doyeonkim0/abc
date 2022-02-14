@@ -22,6 +22,9 @@ class LossInterface(metaclass=abc.ABCMeta):
     def loss_dict(self):
         pass
 
+    def format_time(self, seconds):
+        return f"{seconds//3600//24:02}d {(seconds//3600)%24:02}h {(seconds//60)%60:02}m {seconds%60:02}s"
+
 
 class Loss:
     @classmethod
