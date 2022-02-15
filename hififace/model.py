@@ -20,10 +20,8 @@ class HifiFace(FaceSwapInterface):
     def set_multi_GPU(self):
         utils.setup_ddp(self.gpu, self.args.gpu_num)
 
-        G = torch.nn.parallel.DistributedDataParallel(self.G, device_ids=[self.gpu], broadcast_buffers=False, find_unused_parameters=True)
-        D = torch.nn.parallel.DistributedDataParallel(self.D, device_ids=[self.gpu])
-        self.G = G.module
-        self.D = D.module
+        self.G = torch.nn.parallel.DistributedDataParallel(self.G, device_ids=[self.gpu], broadcast_buffers=False, find_unused_parameters=True)
+        self.D = torch.nn.parallel.DistributedDataParallel(self.D, device_ids=[self.gpu])
 
     def load_checkpoint(self, step=-1):
         checkpoint.load_checkpoint(self.args, self.G, self.opt_G, name='G', global_step=step)
@@ -79,7 +77,7 @@ class HifiFace(FaceSwapInterface):
         loss_D = self.loss_collector.get_loss_D(I_t, d_true, d_fake)
         utils.update_net(self.opt_D, loss_D)
 
-        return [I_s]
+        return [I_s, I_t, I_r, I_cycle]
 
     def save_image(self, result, step):
         utils.save_image(self.args, step, "imgs", result)
