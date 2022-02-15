@@ -27,27 +27,25 @@ class LossInterface(metaclass=abc.ABCMeta):
 
 
 class Loss:
-    @classmethod
-    def initialize(cls):
-        cls.L1 = torch.nn.L1Loss().to("cuda")
-        cls.L2 = torch.nn.MSELoss().to("cuda")
-        cls.lpips = LPIPS().eval().to("cuda")
-        cls.face_up = torch.nn.Upsample(scale_factor=4).to("cuda").eval()
-        cls.face_pool = torch.nn.AdaptiveAvgPool2d((64, 64)).to("cuda").eval()  
-
     def get_id_loss(a, b):
         return (1 - torch.cosine_similarity(a, b, dim=1)).mean()
 
     @classmethod
     def get_lpips_loss(cls, a, b):
+        if not hasattr(cls, 'lpips'):
+            cls.lpips = LPIPS().eval().to("cuda")
         return cls.lpips(a, b)
 
     @classmethod
     def get_L1_loss(cls, a, b):
+        if not hasattr(cls, 'L1'):
+            cls.L1 = torch.nn.L1Loss().to("cuda")
         return cls.L1(a, b)
 
     @classmethod
     def get_L2_loss(cls, a, b):
+        if not hasattr(cls, 'L2'):
+            cls.L2 = torch.nn.MSELoss().to("cuda")
         return cls.L2(a, b)
 
     def get_L1_loss_with_same_person(a, b, same_person, batch_size):
