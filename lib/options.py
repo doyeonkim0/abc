@@ -14,7 +14,7 @@ def train_options():
 
     # Hyperparameters
     parser.add_argument('--batch_per_gpu', type=str, default=8)
-    parser.add_argument('--max_step', type=str, default=200000)
+    parser.add_argument('--max_step', type=str, default=300000)
     parser.add_argument('--same_prob', type=float, default=0.2)
 
     # Dataset

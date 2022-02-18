@@ -56,7 +56,7 @@ class Loss:
     def get_attr_loss(a, b, batch_size):
         L_attr = 0
         for i in range(len(a)):
-            L_attr += torch.mean(torch.pow((a[i] - b[i]), 2).reshape(batch_size, -1), dim=1).mean()
+            L_attr += torch.mean(torch.pow((a[i] - b[i]), 2).reshape(batch_size, -1), dim=1).sum()
         L_attr /= 2.0
 
         return L_attr
