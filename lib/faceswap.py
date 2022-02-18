@@ -32,7 +32,7 @@ class FaceSwapInterface(metaclass=abc.ABCMeta):
         Store Iterator from dataloader as a member variable.
         """
         sampler = torch.utils.data.distributed.DistributedSampler(self.dataset) if self.args.use_mGPU else None
-        self.dataloader = DataLoader(self.dataset, batch_size=self.args.batch_size, pin_memory=True, sampler=sampler, num_workers=8, drop_last=True)
+        self.dataloader = DataLoader(self.dataset, batch_size=self.args.batch_per_gpu, pin_memory=True, sampler=sampler, num_workers=8, drop_last=True)
         self.iterator = iter(self.dataloader)
 
 

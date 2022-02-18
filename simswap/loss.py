@@ -27,13 +27,13 @@ class SimSwapLoss(LossInterface):
 
         # Attribute loss
         if self.args.W_attr:
-            L_attr = Loss.get_attr_loss(I_target, I_swapped, self.args.batch_size)
+            L_attr = Loss.get_attr_loss(I_target, I_swapped, self.args.batch_per_gpu)
             L_G += self.args.W_attr * L_attr
             self.loss_dict["L_attr"] = round(L_attr.item(), 4)
 
         # Reconstruction loss
         if self.args.W_recon:
-            L_recon = Loss.get_L1_loss_with_same_person(I_swapped, I_target, same_person, self.args.batch_size)
+            L_recon = Loss.get_L1_loss_with_same_person(I_swapped, I_target, same_person, self.args.batch_per_gpu)
             L_G += self.args.W_recon * L_recon
             self.loss_dict["L_recon"] = round(L_recon.item(), 4)
         

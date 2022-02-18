@@ -68,7 +68,7 @@ def make_grid_image(images):
 
     for image_list in images:
         image_list = image_list[:8] # Drop images if there are more than 8 images in the list
-        grid_row = torchvision.utils.make_grid(image_list.detach().cpu(), nrow=images.shape[0]) * 0.5 + 0.5
+        grid_row = torchvision.utils.make_grid(image_list.detach().cpu(), nrow=image_list.shape[0]) * 0.5 + 0.5
         grid_rows.append(grid_row)
 
     grid = torch.cat(grid_rows, dim=1).numpy()

@@ -5,9 +5,9 @@ import sys
 
 sys.path.append("./")
 from lib import options, loss
-from simswap.model import SimSwap
+# from simswap.model import SimSwap
 from faceshifter.model import FaceShifter
-from hififace.model import HifiFace
+# from hififace.model import HifiFace
 
 def train(gpu, args): 
     torch.cuda.set_device(gpu)
@@ -36,7 +36,7 @@ def train(gpu, args):
 
     # Initialize wandb to gather and display loss on dashboard 
     if args.isMaster and args.use_wandb:
-        wandb.init(project=args.project_id, name=args.run_id)
+        wandb.init(project=args.model, name=args.run_id)
 
     # Training loop
     global_step = step if step else 0
@@ -68,7 +68,6 @@ if __name__ == "__main__":
     # Set up multi-GPU training
     if args.use_mGPU:  
         args.gpu_num = torch.cuda.device_count()
-        args.batch_size = int(args.batch_size / args.gpu_num)
         torch.multiprocessing.spawn(train, nprocs=args.gpu_num, args=(args, ))
 
     # Set up single GPU training
