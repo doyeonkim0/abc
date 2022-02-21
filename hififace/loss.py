@@ -35,8 +35,8 @@ class HifiFaceLoss(LossInterface):
 
         # Reconstruction loss
         if self.args.W_recon:
-            L_recon = Loss.get_L1_loss_with_same_person(I_r, I_t, same_person, self.args.batch_size)
-            L_recon += Loss.get_L1_loss_with_same_person(I_low, self.face_pool(I_t), same_person, self.args.batch_size)
+            L_recon = Loss.get_L1_loss_with_same_person(I_r, I_t, same_person, self.args.batch_per_gpu)
+            L_recon += Loss.get_L1_loss_with_same_person(I_low, self.face_pool(I_t), same_person, self.args.batch_per_gpu)
             L_G += self.args.W_recon * L_recon
             self.loss_dict["L_recon"] = round(L_recon.item(), 4)
         

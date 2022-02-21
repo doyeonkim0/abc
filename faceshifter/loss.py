@@ -25,13 +25,13 @@ class FaceShifterLoss(LossInterface):
 
         # Attribute loss
         if self.args.W_attr:
-            L_attr = Loss.get_attr_loss(I_t_attr, Y_attr, self.args.batch_size)
+            L_attr = Loss.get_attr_loss(I_t_attr, Y_attr, self.args.batch_per_gpu)
             L_G += self.args.W_attr * L_attr
             self.loss_dict["L_attr"] = round(L_attr.item(), 4)
 
         # Reconstruction loss
         if self.args.W_recon:
-            L_recon = Loss.get_L2_loss_with_same_person(Y, I_t, same_person, self.args.batch_size)
+            L_recon = Loss.get_L2_loss_with_same_person(Y, I_t, same_person, self.args.batch_per_gpu)
             L_G += self.args.W_recon * L_recon
             self.loss_dict["L_recon"] = round(L_recon.item(), 4)
         
