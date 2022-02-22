@@ -1,13 +1,10 @@
-import time
 import torch
 from lib.loss import Loss, LossInterface
 
 
 class HifiFaceLoss(LossInterface):
     def __init__(self, args):
-        self.args = args
-        self.start_time = time.time()
-        self._loss_dict = {}
+        super().__init__(args)
         self.face_pool = torch.nn.AdaptiveAvgPool2d((64, 64)).to("cuda").eval()
 
     def get_loss_G(self, I_t, I_r, I_low, v_id_s, v_id_r, v_id_low, M_tar, M_high, M_low, q_r, q_low, q_fuse, I_cycle, d_adv, same_person):
@@ -74,14 +71,3 @@ class HifiFaceLoss(LossInterface):
         self.loss_dict["L_fake"] = round(L_fake.mean().item(), 4)
 
         return L_D
-    
-    def print_loss(self, global_step):
-        seconds = int(time.time() - self.start_time)
-        print("")
-        print(f"[ {self.format_time(seconds)} ]")
-        print(f'steps: {global_step:06} / {self.args.max_step}')
-        print(f'lossD: {self.loss_dict["L_D"]} | lossG: {self.loss_dict["L_G"]}')
-
-    @property
-    def loss_dict(self):
-        return self._loss_dict
