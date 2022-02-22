@@ -13,6 +13,10 @@ class FaceSwapInterface(metaclass=abc.ABCMeta):
         self.gpu = gpu
 
     def load_next_batch(self):
+        """
+        Load next batch of source image, target image, and boolean values that denote 
+        if source and target are identical.
+        """
         try:
             I_source, I_target, same_person = next(self.iterator)
         except StopIteration:
@@ -23,6 +27,9 @@ class FaceSwapInterface(metaclass=abc.ABCMeta):
         return I_source, I_target, same_person
 
     def set_dataset(self):
+        """
+        Initialize dataset using the dataset paths specified in the command line arguments.
+        """
         self.dataset = FaceDataset(self.args.dataset_root_list, self.args.isMaster, same_prob=self.args.same_prob)
 
     def set_data_iterator(self):
@@ -89,9 +96,15 @@ class FaceSwapInterface(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def save_image(self):
+        """
+        Batch of images from train_step is organized into a table and saved as an image.
+        """
         pass
 
     @abc.abstractmethod
     def save_checkpoint(self):
+        """
+        Save model and optimizer parameters.
+        """
         pass   
     

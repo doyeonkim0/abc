@@ -7,11 +7,17 @@ import time
 
 class LossInterface(metaclass=abc.ABCMeta):
     def __init__(self, args):
+        """
+        When overrided, super call is required.
+        """
         self.args = args
         self.start_time = time.time()
         self.loss_dict = {}
 
     def print_loss(self, global_step):
+        """
+        Print discriminator and generator loss and formatted elapsed time.
+        """
         seconds = int(time.time() - self.start_time)
         print("")
         print(f"[ {seconds//3600//24:02}d {(seconds//3600)%24:02}h {(seconds//60)%60:02}m {seconds%60:02}s ]")
@@ -20,10 +26,22 @@ class LossInterface(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_loss_G(self):
+        """
+        Caculate generator loss.
+        Once loss values are saved in self.loss_dict, they can be uploaded on the 
+        dashboard via wandb or printed in self.print_loss. self.print_loss can be 
+        overrided as needed.
+        """
         pass
 
     @abc.abstractmethod
     def get_loss_D(self):
+        """
+        Caculate discriminator loss.
+        Once loss values are saved in self.loss_dict, they can be uploaded on the 
+        dashboard via wandb or printed in self.print_loss. self.print_loss can be 
+        overrided as needed.
+        """
         pass
 
 
