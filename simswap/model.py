@@ -19,8 +19,8 @@ class SimSwap(FaceSwapInterface):
         utils.setup_ddp(self.gpu, self.args.gpu_num)
 
         # Data parallelism is required to use multi-GPU
-        self.G = torch.nn.parallel.DistributedDataParallel(self.G, device_ids=[self.gpu], broadcast_buffers=False, find_unused_parameters=True).module
-        self.D = torch.nn.parallel.DistributedDataParallel(self.D, device_ids=[self.gpu]).module
+        self.G = torch.nn.parallel.DistributedDataParallel(self.G, device_ids=[self.gpu], broadcast_buffers=False, find_unused_parameters=True)
+        self.D = torch.nn.parallel.DistributedDataParallel(self.D, device_ids=[self.gpu])
         
     def load_checkpoint(self, step=-1):
         checkpoint.load_checkpoint(self.args, self.G, self.opt_G, name='G', global_step=step)
