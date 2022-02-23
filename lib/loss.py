@@ -6,6 +6,12 @@ import time
 
 
 class LossInterface(metaclass=abc.ABCMeta):
+    """
+    Base class for loss of GAN model. Exceptions will be raised when subclass is being 
+    instantiated but abstract methods were not implemented. Concrete methods can be 
+    overrided as well if needed.
+    """
+
     def __init__(self, args):
         """
         When overrided, super call is required.
@@ -46,6 +52,10 @@ class LossInterface(metaclass=abc.ABCMeta):
 
 
 class Loss:
+    """
+    Provide various losses such as LPIPS, L1, L2, BCE and so on.
+    """
+    
     L1 = torch.nn.L1Loss().to("cuda")
     L2 = torch.nn.MSELoss().to("cuda")
 

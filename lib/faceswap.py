@@ -5,6 +5,13 @@ from lib.dataset import FaceDataset
 
 
 class FaceSwapInterface(metaclass=abc.ABCMeta):
+    """
+    Base class for face swapping GAN model. This base class can also be used 
+    for neural network models with different purposes if some of concrete methods 
+    are overrided appropriately. Exceptions will be raised when subclass is being 
+    instantiated but abstract methods were not implemented. 
+    """
+
     def __init__(self, args, gpu):
         """
         When overrided, super call is required.
