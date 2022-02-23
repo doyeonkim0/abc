@@ -5,19 +5,20 @@ import sys
 
 sys.path.append("./")
 from lib import options
-from simswap.model import SimSwap
-from faceshifter.model import FaceShifter
-from hififace.model import HifiFace
+
 
 def train(gpu, args): 
     torch.cuda.set_device(gpu)
     args.isMaster = gpu == 0
 
     if args.model == 'simswap':
+        from simswap.model import SimSwap
         model = SimSwap(args, gpu)
     elif args.model == 'faceshifter':
+        from faceshifter.model import FaceShifter
         model = FaceShifter(args, gpu)
     elif args.model == 'hififace':
+        from hififace.model import HifiFace
         model = HifiFace(args, gpu)
     else:
         print(f"{args.model} is not supported.")
