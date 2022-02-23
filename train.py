@@ -6,8 +6,8 @@ import sys
 sys.path.append("./")
 from lib import options
 from simswap.model import SimSwap
-from faceshifter.model import FaceShifter
-from hififace.model import HifiFace
+# from faceshifter.model import FaceShifter
+# from hififace.model import HifiFace
 
 def train(gpu, args): 
     torch.cuda.set_device(gpu)

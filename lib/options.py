@@ -11,10 +11,11 @@ def train_options():
     parser.add_argument('--run_id', type=str, required=True) 
     parser.add_argument('--gpu_id', type=int, default=0) 
     parser.add_argument('--ckpt_id', type=str, default=None)
+    parser.add_argument('--project_id', type=str, default="simswap")
 
     # Hyperparameters
-    parser.add_argument('--batch_per_gpu', type=str, default=8)
-    parser.add_argument('--max_step', type=str, default=300000)
+    parser.add_argument('--batch_size', type=str, default=64)
+    parser.add_argument('--max_step', type=str, default=200000)
     parser.add_argument('--same_prob', type=float, default=0.2)
 
     # Dataset
@@ -30,7 +31,7 @@ def train_options():
 
     # Log
     parser.add_argument('--loss_cycle', type=str, default=10)
-    parser.add_argument('--image_cycle', type=str, default=1000)
+    parser.add_argument('--image_cycle', type=str, default=100)
     parser.add_argument('--ckpt_cycle', type=str, default=10000)
     parser.add_argument('--save_root', type=str, default="training_result")
 
@@ -40,10 +41,11 @@ def train_options():
     parser.add_argument('--W_adv', type=float, default=1)
     parser.add_argument('--W_recon', type=float, default=10)
     parser.add_argument('--W_seg', type=float, default=0)
-    parser.add_argument('--W_cycle', type=float, default=1)
-    parser.add_argument('--W_lpips', type=float, default=0)
-    parser.add_argument('--W_attr', type=float, default=10)
-    parser.add_argument('--W_fm', type=float, default=0)
+    parser.add_argument('--W_cycle', type=float, default=0)
+    parser.add_argument('--W_lpips', type=float, default=10)
+    parser.add_argument('--W_attr', type=float, default=0)
+    parser.add_argument('--W_fm', type=float, default=10)
+
 
     # Multi GPU
     parser.add_argument('--isMaster', default=False)
