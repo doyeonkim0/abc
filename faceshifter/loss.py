@@ -1,13 +1,7 @@
-import time
 from lib.loss import Loss, LossInterface
 
 
 class FaceShifterLoss(LossInterface):
-    def __init__(self, args):
-        self.args = args
-        self.start_time = time.time()
-        self._loss_dict = {}
-
     def get_loss_G(self, I_t, Y, I_t_attr, I_s_id, Y_attr, Y_id, d_adv, same_person):
         L_G = 0.0
         
@@ -25,13 +19,13 @@ class FaceShifterLoss(LossInterface):
 
         # Attribute loss
         if self.args.W_attr:
-            L_attr = Loss.get_attr_loss(I_t_attr, Y_attr, self.args.batch_size)
+            L_attr = Loss.get_attr_loss(I_t_attr, Y_attr, self.args.batch_per_gpu)
             L_G += self.args.W_attr * L_attr
             self.loss_dict["L_attr"] = round(L_attr.item(), 4)
 
         # Reconstruction loss
         if self.args.W_recon:
-            L_recon = Loss.get_L2_loss_with_same_person(Y, I_t, same_person, self.args.batch_size)
+            L_recon = Loss.get_L2_loss_with_same_person(Y, I_t, same_person, self.args.batch_per_gpu)
             L_G += self.args.W_recon * L_recon
             self.loss_dict["L_recon"] = round(L_recon.item(), 4)
         
@@ -48,15 +42,4 @@ class FaceShifterLoss(LossInterface):
         self.loss_dict["L_D"] = round(L_D.item(), 4)
 
         return L_D
-    
-    def print_loss(self, global_step):
-        seconds = int(time.time() - self.start_time)
-        print("")
-        print(f"[ {self.format_time(seconds)} ]")
-        print(f'steps: {global_step:06} / {self.args.max_step}')
-        print(f'lossD: {self.loss_dict["L_D"]} | lossG: {self.loss_dict["L_G"]}')
-
-    @property
-    def loss_dict(self):
-        return self._loss_dict
         

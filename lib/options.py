@@ -5,7 +5,7 @@ def train_options():
     parser = argparse.ArgumentParser()
 
     # Model
-    parser.add_argument('--model', type=str, default='simswap') 
+    parser.add_argument('--model', type=str, required=True) 
 
     # Experiment id
     parser.add_argument('--run_id', type=str, required=True) 
@@ -45,6 +45,7 @@ def train_options():
     parser.add_argument('--W_lpips', type=float, default=10)
     parser.add_argument('--W_attr', type=float, default=0)
     parser.add_argument('--W_fm', type=float, default=10)
+
 
     # Multi GPU
     parser.add_argument('--isMaster', default=False)

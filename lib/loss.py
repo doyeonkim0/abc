@@ -2,28 +2,47 @@ import abc
 from submodel.lpips import LPIPS
 import torch
 import torch.nn.functional as F
+import time
 
 
 class LossInterface(metaclass=abc.ABCMeta):
+    def __init__(self, args):
+        """
+        When overrided, super call is required.
+        """
+        self.args = args
+        self.start_time = time.time()
+        self.loss_dict = {}
+
+    def print_loss(self, global_step):
+        """
+        Print discriminator and generator loss and formatted elapsed time.
+        """
+        seconds = int(time.time() - self.start_time)
+        print("")
+        print(f"[ {seconds//3600//24:02}d {(seconds//3600)%24:02}h {(seconds//60)%60:02}m {seconds%60:02}s ]")
+        print(f'steps: {global_step:06} / {self.args.max_step}')
+        print(f'lossD: {self.loss_dict["L_D"]} | lossG: {self.loss_dict["L_G"]}')
+
     @abc.abstractmethod
     def get_loss_G(self):
+        """
+        Caculate generator loss.
+        Once loss values are saved in self.loss_dict, they can be uploaded on the 
+        dashboard via wandb or printed in self.print_loss. self.print_loss can be 
+        overrided as needed.
+        """
         pass
 
     @abc.abstractmethod
     def get_loss_D(self):
+        """
+        Caculate discriminator loss.
+        Once loss values are saved in self.loss_dict, they can be uploaded on the 
+        dashboard via wandb or printed in self.print_loss. self.print_loss can be 
+        overrided as needed.
+        """
         pass
-
-    @abc.abstractmethod
-    def print_loss(self):
-        pass
-
-    @property
-    @abc.abstractmethod
-    def loss_dict(self):
-        pass
-
-    def format_time(self, seconds):
-        return f"{seconds//3600//24:02}d {(seconds//3600)%24:02}h {(seconds//60)%60:02}m {seconds%60:02}s"
 
 
 class Loss:
@@ -47,16 +66,16 @@ class Loss:
     def get_L2_loss(cls, a, b):
         return cls.L2(a, b)
 
-    def get_L1_loss_with_same_person(a, b, same_person, batch_size):
-        return torch.sum(torch.mean(torch.abs(a - b).reshape(batch_size, -1), dim=1) * same_person) / (same_person.sum() + 1e-6)
+    def get_L1_loss_with_same_person(a, b, same_person, batch_per_gpu):
+        return torch.sum(torch.mean(torch.abs(a - b).reshape(batch_per_gpu, -1), dim=1) * same_person) / (same_person.sum() + 1e-6)
 
-    def get_L2_loss_with_same_person(a, b, same_person, batch_size):
-        return torch.sum(0.5 * torch.mean(torch.pow(a - b, 2).reshape(batch_size, -1), dim=1) * same_person) / (same_person.sum() + 1e-6)
+    def get_L2_loss_with_same_person(a, b, same_person, batch_per_gpu):
+        return torch.sum(0.5 * torch.mean(torch.pow(a - b, 2).reshape(batch_per_gpu, -1), dim=1) * same_person) / (same_person.sum() + 1e-6)
 
     def get_attr_loss(a, b, batch_size):
         L_attr = 0
         for i in range(len(a)):
-            L_attr += torch.mean(torch.pow((a[i] - b[i]), 2).reshape(batch_size, -1), dim=1).mean()
+            L_attr += torch.mean(torch.pow((a[i] - b[i]), 2).reshape(batch_size, -1), dim=1).sum()
         L_attr /= 2.0
 
         return L_attr
