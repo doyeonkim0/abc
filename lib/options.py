@@ -14,7 +14,7 @@ def train_options():
     parser.add_argument('--project_id', type=str, default="simswap")
 
     # Hyperparameters
-    parser.add_argument('--batch_size', type=str, default=64)
+    parser.add_argument('--batch_per_gpu', type=str, default=8)
     parser.add_argument('--max_step', type=str, default=200000)
     parser.add_argument('--same_prob', type=float, default=0.2)
 
