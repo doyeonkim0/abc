@@ -5,6 +5,32 @@ import cv2
 import os
 
 
+def set_norm_layer(norm_type, norm_dim):
+    if norm_type == 'bn':
+        norm = nn.BatchNorm(norm_dim)
+    elif norm_type == 'in':
+        norm = nn.InstanceNorm2d(norm_dim)
+    elif norm_type == 'none':
+        norm = None
+    else:
+        assert 0, "Unsupported normalization: {}".format(norm)
+    return norm
+
+def set_activate_layer(types):
+    # initialize activation
+    if types == 'relu':
+        activation = nn.ReLU()
+    elif types == 'tanh':
+        activation = nn.Tanh()
+    elif types == 'sig':
+        activation = nn.Sigmoid()
+    elif types == 'none':
+        activation = None
+    else:
+        assert 0, f"Unsupported activation: {types}"
+    return activation
+
+
 class AdaIN(nn.Module):
     def __init__(self, style_dim, num_features):
         super().__init__()
