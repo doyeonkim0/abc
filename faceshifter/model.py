@@ -15,8 +15,8 @@ class FaceShifter(FaceSwapInterface):
         utils.setup_ddp(self.gpu, self.args.gpu_num)
 
         # Data parallelism is required to use multi-GPU
-        self.G = torch.nn.parallel.DistributedDataParallel(self.G, device_ids=[self.gpu], broadcast_buffers=False, find_unused_parameters=True)
-        self.D = torch.nn.parallel.DistributedDataParallel(self.D, device_ids=[self.gpu])
+        self.G = torch.nn.parallel.DistributedDataParallel(self.G, device_ids=[self.gpu], broadcast_buffers=False, find_unused_parameters=True).module
+        self.D = torch.nn.parallel.DistributedDataParallel(self.D, device_ids=[self.gpu]).module
         
     def load_checkpoint(self, step=-1):
         checkpoint.load_checkpoint(self.args, self.G, self.opt_G, name='G', global_step=step)
@@ -36,12 +36,24 @@ class FaceShifter(FaceSwapInterface):
         # train G #
         ###########
 
-        Y, I_t_attr, I_s_id = self.G(I_source, I_target)
+        Y, I_target_attr, I_source_id = self.G(I_source, I_target)
         Y_attr = self.G.get_attr(Y)
         Y_id = self.G.get_id(Y)
         d_adv = self.D(Y)
 
-        loss_G = self.loss_collector.get_loss_G(I_target, Y, I_t_attr, I_s_id, Y_attr, Y_id, d_adv, same_person)
+        G_dict = {
+            "I_source": I_source,
+            "I_target": I_target, 
+            "same_person": same_person, 
+            "I_target_attr": I_target_attr,
+            "I_source_id": I_source_id,
+            "Y": Y,
+            "Y_attr": Y_attr,
+            "Y_id": Y_id,
+            "d_adv": d_adv
+        }
+
+        loss_G = self.loss_collector.get_loss_G(G_dict)
         utils.update_net(self.opt_G, loss_G)
 
         ###########
@@ -50,8 +62,13 @@ class FaceShifter(FaceSwapInterface):
 
         d_real = self.D(I_source)
         d_fake = self.D(Y.detach())
+
+        D_dict = {
+            "d_real": d_real,
+            "d_fake": d_fake,
+        }
         
-        loss_D = self.loss_collector.get_loss_D(d_real, d_fake)
+        loss_D = self.loss_collector.get_loss_D(D_dict)
         utils.update_net(self.opt_D, loss_D)
 
         return [I_source, I_target, Y]
