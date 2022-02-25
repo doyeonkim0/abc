@@ -19,11 +19,14 @@ def train_options():
     parser.add_argument('--same_prob', type=float, default=0.2)
 
     # Dataset
-    parser.add_argument('--dataset_root_list', type=list, \
+    parser.add_argument('--train_dataset_root_list', type=list, \
         # default=['/home/compu/dataset/kface_wild_cv2_256'])
         default=['/home/compu/dataset/CelebHQ'])
         # default=['/home/compu/dataset/kface_wild_1024'])
         # default=['/home/compu/datasets/k-celeb'])
+        
+    parser.add_argument('--valid_dataset_root', type=str, \
+        default='/home/compu/abc/samples', help="dir path or None")
 
     # Learning rate
     parser.add_argument('--lr_G', type=str, default=1e-4)

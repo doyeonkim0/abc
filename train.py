@@ -31,6 +31,7 @@ def train(gpu, args):
         model.set_multi_GPU()
 
     model.set_data_iterator()
+    model.set_valid_set()
     model.set_optimizers()
     step = model.load_checkpoint()
     model.set_loss_collector()
@@ -54,6 +55,9 @@ def train(gpu, args):
             # Save image
             if global_step % args.image_cycle == 0:
                 model.save_image(result, global_step)
+
+                if args.valid_dataset_root:
+                    model.validation(global_step) 
 
             # Save checkpoint parameters 
             if global_step % args.ckpt_cycle == 0:

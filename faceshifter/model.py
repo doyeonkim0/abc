@@ -73,6 +73,11 @@ class FaceShifter(FaceSwapInterface):
 
         return [I_source, I_target, Y]
 
+    def validation(self, step):
+        with torch.no_grad():
+            Y = self.G(self.valid_source, self.valid_target)[0]
+        utils.save_image(self.args, step, "valid_imgs", [self.valid_source, self.valid_target, Y])
+
     def save_image(self, result, step):
         utils.save_image(self.args, step, "imgs", result)
         
