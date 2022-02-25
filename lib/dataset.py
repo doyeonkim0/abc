@@ -6,7 +6,7 @@ from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 
 
-class FaceDataset(Dataset):
+class FaceDatasetTrain(Dataset):
     def __init__(self, dataset_root_list, isMaster, same_prob=0.2):
         self.datasets = []
         self.N = []
@@ -29,7 +29,7 @@ class FaceDataset(Dataset):
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         ])
         if isMaster:
-            print(f"Dataset of {self.__len__()} images constructed.")
+            print(f"Dataset of {self.__len__()} images constructed for the training.")
 
     def __getitem__(self, item):
         idx = 0
@@ -52,3 +52,32 @@ class FaceDataset(Dataset):
     def __len__(self):
         return sum(self.N)
 
+
+class FaceDatasetValid(Dataset):
+    def __init__(self, valid_data_dir, isMaster):
+        
+        self.source_path_list = sorted(glob.glob(f"{valid_data_dir}/source/*.*g"))
+        self.target_path_list = sorted(glob.glob(f"{valid_data_dir}/target/*.*g"))
+
+        # take the smaller number if two dirs have different numbers of images
+        self.N = min(len(self.source_path_list), len(self.target_path_list))
+
+        self.transforms = transforms.Compose([
+            transforms.Resize((256,256)),
+            transforms.ColorJitter(0.2, 0.2, 0.2, 0.01),
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        ])
+
+        if isMaster:
+            print(f"Dataset of {self.__len__()} images constructed for the validation.")
+
+    def __getitem__(self, idx):
+        
+        Xs = Image.open(self.source_path_list[idx]).convert("RGB")
+        Xt = Image.open(self.target_path_list[idx]).convert("RGB")
+
+        return self.transforms(Xs), self.transforms(Xt)
+
+    def __len__(self):
+        return self.N

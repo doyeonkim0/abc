@@ -1,7 +1,7 @@
 import abc
 import torch
 from torch.utils.data import DataLoader
-from lib.dataset import FaceDataset
+from lib.dataset import FaceDatasetTrain, FaceDatasetValid
 
 
 class FaceSwapInterface(metaclass=abc.ABCMeta):
@@ -25,10 +25,10 @@ class FaceSwapInterface(metaclass=abc.ABCMeta):
         if source and target are identical.
         """
         try:
-            I_source, I_target, same_person = next(self.iterator)
+            I_source, I_target, same_person = next(self.train_iterator)
         except StopIteration:
-            self.iterator = iter(self.dataloader)
-            I_source, I_target, same_person = next(self.iterator)
+            self.train_iterator = iter(self.train_dataloader)
+            I_source, I_target, same_person = next(self.train_iterator)
             
         I_source, I_target, same_person = I_source.to(self.gpu), I_target.to(self.gpu), same_person.to(self.gpu)
         return I_source, I_target, same_person
@@ -37,7 +37,9 @@ class FaceSwapInterface(metaclass=abc.ABCMeta):
         """
         Initialize dataset using the dataset paths specified in the command line arguments.
         """
-        self.dataset = FaceDataset(self.args.dataset_root_list, self.args.isMaster, same_prob=self.args.same_prob)
+        self.train_dataset = FaceDatasetTrain(self.args.train_dataset_root_list, self.args.isMaster, same_prob=self.args.same_prob)
+        if self.args.valid_dataset_root:
+            self.valid_dataset = FaceDatasetValid(self.args.valid_dataset_root, self.args.isMaster)
 
     def set_data_iterator(self):
         """
@@ -45,10 +47,19 @@ class FaceSwapInterface(metaclass=abc.ABCMeta):
         Using self.dataset and sampler, construct dataloader.
         Store Iterator from dataloader as a member variable.
         """
-        sampler = torch.utils.data.distributed.DistributedSampler(self.dataset) if self.args.use_mGPU else None
-        self.dataloader = DataLoader(self.dataset, batch_size=self.args.batch_per_gpu, pin_memory=True, sampler=sampler, num_workers=8, drop_last=True)
-        self.iterator = iter(self.dataloader)
+        sampler = torch.utils.data.distributed.DistributedSampler(self.train_dataset) if self.args.use_mGPU else None
+        self.train_dataloader = DataLoader(self.train_dataset, batch_size=self.args.batch_per_gpu, pin_memory=True, sampler=sampler, num_workers=8, drop_last=True)
+        self.train_iterator = iter(self.train_dataloader)
 
+    def set_valid_set(self):
+        """
+        Predefine test images only if args.valid_dataset_root is specified.
+        These images are anchored for checking the improvement of the model.
+        """
+        if self.args.valid_dataset_root:
+            self.valid_dataloader = DataLoader(self.valid_dataset, batch_size=self.args.batch_per_gpu, num_workers=8, drop_last=True)
+            I_source, I_target = next(iter(self.valid_dataloader))
+            self.valid_source, self.valid_target = I_source.to(self.gpu), I_target.to(self.gpu)
 
     @abc.abstractmethod
     def initialize_models(self):
@@ -98,6 +109,14 @@ class FaceSwapInterface(metaclass=abc.ABCMeta):
         This method should return list of images that was created during training.
         Returned images are passed to self.save_image and self.save_image is called in the 
         training loop preiodically.
+        """
+        pass
+
+    @abc.abstractmethod
+    def validation(self):
+        """
+        Test the model using a predefined valid set.
+        This method includes util.save_image and returns nothing.
         """
         pass
 
